@@ -81,7 +81,7 @@ sep #%00100000  ;8 bit ab - sets the m flag - 8 bit accumulator register size.  
 
 ldx #$0000 ; puts value 0 in x?                    #$ = ????                              LDX 	Load register X from memory
 - lda UntitledPalette.l,x ; puts value found in pallette.l+x into a?                       LDA 	Load accumulator from memory
-sta $2122 ; puts a into 2122??                                                               STA 	Store accumulator in memory
+sta $2122 ; puts a into 2122, which adds to ppu and auto increments                                                               STA 	Store accumulator in memory
 inx ; INX 	Increment X register
 cpx #8 ; CPX 	Compare register X with memory - the n, z, c flags are set by this - negative, zero==, carry = less than (so are these less than and more than?)
 bne - ; BNE 	Branch if not equal (Z=0) , The bne - branches to the nearest "-" backwards. 
@@ -151,6 +151,7 @@ ldx #$4000	    ; write to vram
 stx $2116       ; from $4000
 
 
+;2105 - SCREEN mode register
 
 ;The main data area is the VRAM, a 64 KB memory space that can be accessed with registers $2115, $2116, $2118, and $2139. 
 ;This area is used for storing all the tiles used in your game, as well as the tile maps. 
@@ -165,7 +166,7 @@ stx $2116       ; from $4000
 .rept 2
    ;X|X|X
 
-     ldx #$0082 ; tile 0 ( )
+     ldx #$0000 ; tile 0 ( )
      stx $2118
      ldx #$0083 ; tile 1 (|)
      stx $2118
