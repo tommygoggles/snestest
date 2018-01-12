@@ -1,10 +1,14 @@
 
+
+;Register $2105: Screen mode register (1b/W) - sets screen mode, and 8*8 or 16*16 for each of the up to 4 BGs. also priority.
+
+
 ;VRAM, 64 KB, accessed with registers $2115, $2116, $2118, and $2139.
-;	Stores tiles, tile maps.
+;	Stores tiles AND tile maps.
 ;OAM, 544 Bytes, accessed with 
 ;	sprite properties. 4 bytes per sprite * 128 sprites = 512 bytes. +32 bytes for ??? 2 more bits info??
-;CGRAM, 512 bytes, accessed with 
-;	= 256 colours (15-bit) - other bit unused??
+;CGRAM, 512 bytes, accessed with 2121, 2122
+;	palettes = 256 colours (15-bit) - other bit unused??
 
 
 ;TILE
@@ -37,7 +41,22 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 ;To read it back, use register 2139
 ;To set where to put it in VRAM, or where to read VRAM back, use register 2116 (remember to dummy read)
 
+;can use DMA to do this
 
+
+;Register $2107-$210A: Tile map location (4*1B/W) - tile map address and size (32*32 = 1024, 32*64 = 2048, 64*32 = 2048, 64*64 = 4096)
+;each of these 1024, 2048, or 4096 tiles has 2 bytes in the tile map (hflip, vflip, palette, priority, tile number relative to that given in Register $210B/$210C for that BG?)
+; guess this is one for each BG? ..... address_of_character = (base_location_bits << 13) + (8 * color_depth * character_number); 
+;2k, 4k, or 8k memory (/64k) used for a tile map then?
+
+;The number formed by the 3 palette bits is multiplied by the number of colors in the BG to get the starting index in the color palette.
+; palette 010 (2) in 4 colour mode = starts at 8?
+
+;PALETTE
+;  To upload palette entries to CGRAM, select the color with register $2121, and then begin sending the bytes to register $2122. 
+
+;SPRITES
+;All SNES sprites are 16 colors.
 
 
 
