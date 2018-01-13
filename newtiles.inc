@@ -1,4 +1,4 @@
-
+;https://en.wikibooks.org/wiki/Super_NES_Programming/SNES_Hardware_Registers
 
 ;Register $2105: Screen mode register (1b/W) - sets screen mode, and 8*8 or 16*16 for each of the up to 4 BGs. also priority.
 
@@ -6,7 +6,7 @@
 ;VRAM, 64 KB, accessed with registers $2115, $2116, $2118, and $2139.
 ;	Stores tiles AND tile maps.
 ;OAM, 544 Bytes, accessed with 
-;	sprite properties. 4 bytes per sprite * 128 sprites = 512 bytes. +32 bytes for ??? 2 more bits info??
+;	sprite properties. (4 bytes per sprite + 2 bits) * 128 sprites = 512 bytes + 32 bytes
 ;CGRAM, 512 bytes, accessed with 2121, 2122
 ;	palettes = 256 colours (15-bit) - other bit unused??
 
@@ -56,7 +56,10 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 ;  To upload palette entries to CGRAM, select the color with register $2121, and then begin sending the bytes to register $2122. 
 
 ;SPRITES
-;All SNES sprites are 16 colors.
+;All SNES sprites are 16 colors. (4 bit) 32 bytes per 8x8 tile.
+;bits 5-7 of register 2101 set which 2 sizes of sprite are on. 8,16,32,64
+; base selection bits of 2101 are bits 0-2 (name bits too?)
+;bytes 0-511 = a row of the full sprite, made of 1,2,4, or 8 8x8 tiles. meaning you can fit 16,8,4, or 2 of these in a row.
+;the other rows follow this
 
-
-
+;in OAM, 
