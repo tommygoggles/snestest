@@ -1,6 +1,7 @@
 ;https://en.wikibooks.org/wiki/Super_NES_Programming/SNES_Hardware_Registers
 
-;Register $2105: Screen mode register (1b/W) - sets screen mode, and 8*8 or 16*16 for each of the up to 4 BGs. also priority.
+;Register $2105: Screen mode register (1b/W) - sets screen mode, and 8*8 or 16*16 pixel tile size for each of the up to 4 BGs. also priority.
+;but how does 16x16 pixel tile mode work? how are they stored? like sprites?
 
 
 ;VRAM, 64 KB, accessed with registers $2115, $2116, $2118, and $2139.
@@ -46,7 +47,8 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 
 ;Register $2107-$210A: Tile map location (4*1B/W) - tile map address and size (32*32 = 1024, 32*64 = 2048, 64*32 = 2048, 64*64 = 4096)
 ;each of these 1024, 2048, or 4096 tiles has 2 bytes in the tile map (hflip, vflip, palette, priority, tile number relative to that given in Register $210B/$210C for that BG?)
-; guess this is one for each BG? ..... address_of_character = (base_location_bits << 13) + (8 * color_depth * character_number); 
+; guess this is one for each BG? ..... address_of_character = (base_location_bits << 13) + (8 * color_depth * character_number);
+;. 8*2-bit = 16bytes , * character number
 ;2k, 4k, or 8k memory (/64k) used for a tile map then?
 
 ;The number formed by the 3 palette bits is multiplied by the number of colors in the BG to get the starting index in the color palette.
@@ -58,8 +60,12 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 ;SPRITES
 ;All SNES sprites are 16 colors. (4 bit) 32 bytes per 8x8 tile.
 ;bits 5-7 of register 2101 set which 2 sizes of sprite are on. 8,16,32,64
-; base selection bits of 2101 are bits 0-2 (name bits too?)
+; base selection bits of 2101 are bits 0-2 (there are name bits too?)
 ;bytes 0-511 = a row of the full sprite, made of 1,2,4, or 8 8x8 tiles. meaning you can fit 16,8,4, or 2 of these in a row.
 ;the other rows follow this
 
-;in OAM, 
+;in OAM- which size, x coord(9bit), y coord(8), start tile num, palette num, vflip, hflip, priority
+;in 2101, bits 0-2. 011 shift left by 14. so 011 = 0 11000000 00000000, or 00C000. choices are 00 40 80 C0
+
+
+
