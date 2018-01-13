@@ -40,7 +40,7 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 
 ;To put tile in VRAM, use Register $2118/$2119: VRAM data write (2b/W). auto incremented if register $2115 says so
 ;To read it back, use register 2139
-;To set where to put it in VRAM, or where to read VRAM back, use register 2116 (remember to dummy read)
+;To set where to put it in VRAM, or where to read VRAM back, use register 2116 - takes word address, *2 for byte address (remember to dummy read)
 
 ;can use DMA to do this
 
@@ -55,17 +55,18 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 ; palette 010 (2) in 4 colour mode = starts at 8?
 
 ;PALETTE
-;  To upload palette entries to CGRAM, select the color with register $2121, and then begin sending the bytes to register $2122. 
+;  To upload palette entries to CGRAM, select the color with register $2121 (word addr), and then begin sending the bytes to register $2122. 
 
 ;SPRITES
 ;All SNES sprites are 16 colors. (4 bit) 32 bytes per 8x8 tile.
 ;bits 5-7 of register 2101 set which 2 sizes of sprite are on. 8,16,32,64
 ; base selection bits of 2101 are bits 0-2 (there are name bits too?)
-;bytes 0-511 = a row of the full sprite, made of 1,2,4, or 8 8x8 tiles. meaning you can fit 16,8,4, or 2 of these in a row.
+;bytes 0-511 (enough for 16 8*8 tiles) = a row of the full sprite, made of 1,2,4, or 8 8x8 tiles. meaning you can fit 16,8,4, or 2 of these in a row.
 ;the other rows follow this
 
 ;in OAM- which size, x coord(9bit), y coord(8), start tile num, palette num, vflip, hflip, priority
-;in 2101, bits 0-2. 011 shift left by 14. so 011 = 0 11000000 00000000, or 00C000. choices are 00 40 80 C0
+;in 2101, bits 0-2. 011 shift left by 14. so 011 = 0 11000000 00000000, or 00C000. so choices are 0000 4000 8000 C000. added = TILE NUMBER 000-1FF, * 32 = 
+; 1 11111111 11111 = 111111 11111111 = 3FFF, so 0-3FFF, 4000-7FFF, 8000 - BFFF, C000-FFFF etc. everything covered in 64k vram.
 
-
-
+;do a visual representation of memory? start points, what goes to what, possible sizes?
+ 
