@@ -37,7 +37,23 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 		; =
 		$7e, $81, $18, $e7, $18, $e7, $18, $e7, $18, $00, $18, $00, $18, $00, $FF, $FF
 
+One4bit16colour8by8tile:;colour ramp part 1
+	.db ;00000000 - $00 - for ramp part 2, change this to all 1's ($FF)
+		;00001111 - $0F
+		;repeat x 7
+		
+		;00110011 - $33
+		;01010101 - $55
+		;repeat * 7
+		$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F, $33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55
+;and the next tile.. ramp part 2.. why not...?
+		$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F, $33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55
 
+RedRampPalette16colour:
+	.db $00,$00, $00,$02, $00,$04, $00,$06, $00,$08, $00,$0A, $00,$0C, $00,$0E, 
+	    $00,$10, $00,$12, $00,$14, $00,$16, $00,$18, $00,$1A, $00,$1C, $00,$1F, 
+
+		
 ;To put tile in VRAM, use Register $2118/$2119: VRAM data write (2b/W). auto incremented if register $2115 says so
 ;To read it back, use register 2139
 ;To set where to put it in VRAM, or where to read VRAM back, use register 2116 - takes word address, *2 for byte address (remember to dummy read)
@@ -56,6 +72,11 @@ One2bit4colour8by8tile: ;a T - in colour 01, with background colour 10 at the to
 
 ;PALETTE
 ;  To upload palette entries to CGRAM, select the color with register $2121 (word addr), and then begin sending the bytes to register $2122. 
+
+RedGreenBlueWhitePalette: ;least significant byte first
+    .db $1F,$00,     $E0,$03,     $00,$7c,    $FF,$7F
+	;transparent colour?????
+	
 
 ;SPRITES
 ;All SNES sprites are 16 colors. (4 bit) 32 bytes per 8x8 tile.
