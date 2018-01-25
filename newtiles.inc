@@ -1,3 +1,33 @@
+.include "TGHeader.inc"
+.include "TGSnes_Init.asm"
+
+.bank 0 slot 0
+.org 0
+.section "Vblank"
+;--------------------------------------
+VBlank:
+rti ; RTI 	Return from interrupt
+;--------------------------------------
+.ends
+
+.bank 0  slot 0
+.org 0
+.section "MainCode"
+
+Start:
+ Snes_Init
+ loadpalette
+ 
+ 
+ 
+ Forever:
+ jmp Forever
+ 
+.ends
+ 
+ 
+ 
+
 ;https://en.wikibooks.org/wiki/Super_NES_Programming/SNES_Hardware_Registers
 
 ;Register $2105: Screen mode register (1b/W) - sets screen mode, and 8*8 or 16*16 pixel tile size for each of the up to 4 BGs. also priority.
@@ -10,6 +40,11 @@
 ;	sprite properties. (4 bytes per sprite + 2 bits) * 128 sprites = 512 bytes + 32 bytes
 ;CGRAM, 512 bytes, accessed with 2121, 2122
 ;	palettes = 256 colours (15-bit) - other bit unused??
+
+.bank 1 slot 0 ;bank 1
+.org 0
+.section "graphicsdata"
+
 
 
 ;TILE
@@ -49,9 +84,7 @@ One4bit16colour8by8tile:;colour ramp part 1
 ;and the next tile.. ramp part 2.. why not...?
 		$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F,$FF,$0F, $33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55,$33,$55
 
-RedRampPalette16colour:
-	.db $00,$00, $00,$02, $00,$04, $00,$06, $00,$08, $00,$0A, $00,$0C, $00,$0E, 
-	    $00,$10, $00,$12, $00,$14, $00,$16, $00,$18, $00,$1A, $00,$1C, $00,$1F, 
+
 
 		
 ;To put tile in VRAM, use Register $2118/$2119: VRAM data write (2b/W). auto incremented if register $2115 says so
@@ -59,6 +92,7 @@ RedRampPalette16colour:
 ;To set where to put it in VRAM, or where to read VRAM back, use register 2116 - takes word address, *2 for byte address (remember to dummy read)
 
 ;can use DMA to do this
+
 
 
 ;Register $2107-$210A: Tile map location (4*1B/W) - tile map address and size (32*32 = 1024, 32*64 = 2048, 64*32 = 2048, 64*64 = 4096)
@@ -70,13 +104,44 @@ RedRampPalette16colour:
 ;The number formed by the 3 palette bits is multiplied by the number of colors in the BG to get the starting index in the color palette.
 ; palette 010 (2) in 4 colour mode = starts at 8?
 
+
+
 ;PALETTE
 ;  To upload palette entries to CGRAM, select the color with register $2121 (word addr), and then begin sending the bytes to register $2122. 
 
 RedGreenBlueWhitePalette: ;least significant byte first
     .db $1F,$00,     $E0,$03,     $00,$7c,    $FF,$7F
 	;transparent colour?????
-	
+
+RedRampPalette16colour:
+	.db $00,$00, $02,$00, $04,$00, $06,$00, $08,$00, $0A,$00, $0C,$00, $0E,$00
+	    $10,$00, $12,$00, $14,$00, $16,$00, $18,$00, $1A,$00, $1C,$00, $1F,$00
+
+		
+.ends;graphics data
+
+		
+
+.MACRO loadpalette
+		
+rep #%00010000  ;clears the x flag - 16 bit index register size.
+
+	ldx #$0000; colour 0
+	stx $2121; chosen
+
+	ldx #$0000 ;puts value 0 in x
+	sep #%00100000  ;sets the m flag - 8 bit accumulator register size.
+	- lda RedRampPalette16colour.l,x ; puts value found in pallette.l+x into a?
+	sta $2122 ; puts a into 2122, which adds to ppu and auto increments
+	inx ; INX 	Increment X register
+	cpx #(16*2) ; CPX 	Compare register X with memory - the n, z, c flags are set by this - negative, zero==, carry = less than (so are these less than and more than?)
+	bne -
+
+.endm
+
+
+
+
 
 ;SPRITES
 ;All SNES sprites are 16 colors. (4 bit) 32 bytes per 8x8 tile.
